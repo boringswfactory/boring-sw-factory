@@ -145,7 +145,7 @@ bash "$REPO_ROOT/factory.sh" "$PROJECT_BRIEF"
 
 # Pull latest generated project and copy deliverables into docs/
 FACTORY_PROJECTS="$REPO_ROOT/projects"
-LATEST=$(ls -t "$FACTORY_PROJECTS" 2>/dev/null | head -1)
+LATEST=$(find "$FACTORY_PROJECTS" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %f\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
 
 if [[ -n "$LATEST" ]]; then
   for team in backend frontend platform qa security docs; do
@@ -177,7 +177,7 @@ ITEMS_TO_REMOVE=(
 
 for item in "${ITEMS_TO_REMOVE[@]}"; do
   if [[ -e "$REPO_ROOT/$item" ]]; then
-    git rm -rf "$REPO_ROOT/$item" --quiet 2>/dev/null || rm -rf "$REPO_ROOT/$item"
+    git rm -rf "$REPO_ROOT/${item:?}" --quiet 2>/dev/null || rm -rf "$REPO_ROOT/${item:?}"
   fi
 done
 

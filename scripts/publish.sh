@@ -15,6 +15,7 @@ C_BOLD='\033[1m'; C_GREEN='\033[92m'; C_RESET='\033[0m'
 ok() { echo -e "${C_GREEN}✓${C_RESET}  $*"; }
 
 # Load config or use arg
+# shellcheck source=/dev/null
 if [[ -f "$FACTORY_CONFIG" ]]; then source "$FACTORY_CONFIG"; fi
 TARGET_ORG="${1:-${FACTORY_ORG:-${FACTORY_OWNER:-""}}}"
 

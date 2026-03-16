@@ -10,7 +10,7 @@ set -euo pipefail
 FACTORY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECTS_DIR="$FACTORY_DIR/projects"
 
-C_RESET='\033[0m'; C_BOLD='\033[1m'; C_DIM='\033[2m'
+C_RESET='\033[0m'; C_BOLD='\033[1m'
 C_GREEN='\033[92m'; C_YELLOW='\033[93m'; C_RED='\033[91m'
 
 ok()   { echo -e "${C_GREEN}✓${C_RESET}  $*"; }
@@ -21,7 +21,7 @@ err()  { echo -e "${C_RED}✗${C_RESET}  $*" >&2; exit 1; }
 if [[ $# -gt 0 ]]; then
   PROJECT_DIR="$1"
 else
-  LATEST=$(ls -t "$PROJECTS_DIR" 2>/dev/null | head -1)
+  LATEST=$(find "$PROJECTS_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %f\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
   [[ -n "$LATEST" ]] || err "No projects found in $PROJECTS_DIR"
   PROJECT_DIR="$PROJECTS_DIR/$LATEST"
 fi
