@@ -1,0 +1,36 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+._*
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build
+dist/
+build/
+*.egg-info/

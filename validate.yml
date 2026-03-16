@@ -1,0 +1,59 @@
+name: Factory CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    name: Validate factory
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check all agent prompts exist
+        run: |
+          for agent in backend frontend platform qa security docs; do
+            [[ -f "agents/${agent}.md" ]] || { echo "Missing: agents/${agent}.md"; exit 1; }
+          done
+          echo "All agent prompts present ✓"
+
+      - name: Validate shell scripts
+        run: |
+          sudo apt-get install -y shellcheck -q
+          shellcheck bootstrap.sh factory.sh review.sh scripts/setup-github.sh
+
+      - name: Validate project-template workflows
+        run: |
+          python3 -c "
+          import yaml, glob, sys
+          errors = []
+          for f in glob.glob('project-templates/.github/workflows/*.yml'):
+              try:
+                  yaml.safe_load(open(f))
+                  print(f'  ✓ {f}')
+              except yaml.YAMLError as e:
+                  errors.append(f'{f}: {e}')
+          if errors:
+              print('\n'.join(errors)); sys.exit(1)
+          "
+
+      - name: Check CODEOWNERS template has placeholder
+        run: |
+          grep -q "OWNER_GITHUB_USERNAME" project-templates/.github/CODEOWNERS \
+            || { echo "CODEOWNERS missing @OWNER_GITHUB_USERNAME placeholder"; exit 1; }
+          echo "CODEOWNERS template valid ✓"
+
+      - name: Validate CLAUDE.md has required fields
+        run: |
+          python3 -c "
+          import re, sys
+          content = open('CLAUDE.md').read()
+          required = ['projectName', 'slug', 'techStack', 'teams', 'security', 'docs']
+          missing = [f for f in required if f not in content]
+          if missing:
+              print(f'CLAUDE.md missing fields: {missing}'); sys.exit(1)
+          print('CLAUDE.md schema valid ✓')
+          "
